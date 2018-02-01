@@ -13,9 +13,11 @@ import org.junit.Test;
 import water.DKV;
 import water.Key;
 import water.TestUtil;
+import water.exceptions.H2OIllegalArgumentException;
 import water.exceptions.H2OModelBuilderIllegalArgumentException;
 import water.fvec.Frame;
 import water.fvec.NFSFileVec;
+import water.fvec.Vec;
 import water.parser.ParseDataset;
 
 import java.io.File;
@@ -23,12 +25,8 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
-import water.fvec.*;
-import static water.util.FileUtils.*;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
+import static water.util.FileUtils.getFile;
 
 /**
  * Created by tomasnykodym on 6/4/15.
@@ -650,12 +648,15 @@ public class GLMBasicTestRegression extends TestUtil {
       assertFalse("should've thrown, p-values only supported with IRLSM",true);
     } catch(H2OModelBuilderIllegalArgumentException t) {
     }
+    boolean naive_descent_exception_thrown = false;
     try {
       params._solver = Solver.COORDINATE_DESCENT_NAIVE;
       new GLM(params).trainModel().get();
       assertFalse("should've thrown, p-values only supported with IRLSM",true);
-    } catch(H2OModelBuilderIllegalArgumentException t) {
+    } catch (H2OIllegalArgumentException t) {
+      naive_descent_exception_thrown = true;
     }
+    assertTrue(naive_descent_exception_thrown);
     try {
       params._solver = Solver.COORDINATE_DESCENT;
       new GLM(params).trainModel().get();
